@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!-- http://wiki.ros.org/urdf/XML/link -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- Dimensions for the LiDAR sensor-->
+<xacro:property name="lidar_offset_x" value="0.16"/> <!-- relative to base link-->
+<xacro:property name="lidar_offset_chassis_z" value="0.18"/> <!-- relative to chassis-->
+<xacro:property name="lidar_offset_z" value="${lidar_offset_chassis_z + chassis_offset_z}"/> <!-- relative to base link-->
+<xacro:property name= "lidar_radius" value="0.0345"/> 
+<xacro:property name= "lidar_height" value="0.023"/>
+<xacro:property name= "lidar_spacer_height" value="0.1"/>
+<xacro:property name= "lidar_spacer_radius" value= "0.01"/>
+
+
+<link name="lidar_link">
+   <visual>
+        <geometry>
+            <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+        </geometry>
+        <material name="Dark"/>
+    </visual>
+
+<!-- visual for LiDAR spacer -->
+    <visual>
+        <origin xyz="0 0 -${lidar_height/2 + lidar_spacer_height/2}"/>
+        <geometry>
+            <cylinder radius ="${lidar_spacer_radius}" length= "${lidar_spacer_height}"/>
+        </geometry>
+        <material name="Dark"/>
+    </visual>
+    <!--
+    <collision>
+        <geometry>
+            <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+        </geometry>
+    </collision>
+    -->
+    <xacro:inertia_of_cylinder mass="0.06" radius="${lidar_radius}" length="${lidar_height}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertia_of_cylinder>
+</link>
+
+<joint name="lidar_link_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <origin xyz="${lidar_offset_x} 0 ${lidar_offset_z}" rpy="0 0 0"/>
+    <axis xyz="0 0 0"/>
+</joint>
+
+<gazebo reference="lidar_link"> <!--changed lidar_link to lidar_link-->
+    <material name="Dark"/>
+    <sensor name="lidar_link" type="gpu_lidar">
+        <pose> 0 0 0 0 0 0 </pose>
+        <visualize>true</visualize>
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+
+        <lidar>
+            <scan>
+                <horizontal>
+                    <samples>360</samples>
+                    <min_angle>-3.14</min_angle>
+                    <max_angle>3.14</max_angle>
+                </horizontal>
+            </scan>
+
+                <range>
+                    <min>0.1</min>
+                    <max>12</max>
+                </range>
+        </lidar>
+        <gz_frame_id>lidar_link</gz_frame_id>
+        <topic>scan</topic>
+    </sensor>
+</gazebo>
+
+</robot>

@@ -1,0 +1,6 @@
+frames_*.pdf
+frames_*.gv
+build/
+install/
+log/
+
